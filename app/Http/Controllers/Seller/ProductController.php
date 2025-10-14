@@ -7,7 +7,7 @@ use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
-use Intervention\Image\ImageManager;
+use Intervention\Image\Facades\Image;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests; 
 
 class ProductController extends Controller
@@ -50,13 +50,9 @@ class ProductController extends Controller
         if ($request->hasFile('image')) {
             $image = $request->file('image');
             $filename = time() . '.' . $image->getClientOriginalExtension();
-
-            // Optimize and save image using Intervention Image v3
-            $manager = new ImageManager();
-            $img = $manager->read($image->getRealPath());
-            $img->scale(width: 800)->toJpeg()->save(storage_path('app/public/products/' . $filename));
-
-            $path = 'products/' . $filename;
+            
+            // Store the image directly using Laravel's built-in storage
+            $path = $image->storeAs('products', $filename, 'public');
         }
     
         auth()->user()->products()->create([
