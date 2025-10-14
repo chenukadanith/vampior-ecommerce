@@ -43,6 +43,12 @@
                         <div class="border-t border-gray-200"></div> 
                          @endrole
 
+                         @hasanyrole('admin|seller')
+                         <x-dropdown-link :href="auth()->user()->hasRole('admin') ? route('admin.products.index') : route('seller.products.index')">
+                             {{ __('Manage Products') }}
+                         </x-dropdown-link>
+                        @endhasanyrole
+
                         <x-dropdown-link :href="route('profile.edit')">
                             {{ __('Profile') }}
                         </x-dropdown-link>
@@ -94,6 +100,12 @@
                         {{ __('Manage Users') }}
                     </x-responsive-nav-link>
                 @endrole
+
+                @hasanyrole('admin|seller')
+                <x-responsive-nav-link :href="auth()->user()->hasRole('admin') ? route('admin.products.index') : route('seller.products.index')">
+                    {{ __('Manage Products') }}
+                </x-responsive-nav-link>
+            @endhasanyrole
 
                 <x-responsive-nav-link :href="route('profile.edit')">
                     {{ __('Profile') }}
