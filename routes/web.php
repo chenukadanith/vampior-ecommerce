@@ -11,6 +11,8 @@ use App\Http\Controllers\Seller\ProductController as SellerProductController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ProductViewController;
 use App\Http\Controllers\CartController; 
+use App\Http\Controllers\CheckoutController;
+
 
 
 /*
@@ -47,6 +49,13 @@ Route::middleware(['auth'])->group(function () {
     Route::patch('/cart/update/{product}', [CartController::class, 'update'])->name('cart.update');
     Route::delete('/cart/remove/{product}', [CartController::class, 'remove'])->name('cart.remove');
     Route::post('/cart/clear', [CartController::class, 'clear'])->name('cart.clear');
+});
+
+// --- CHECKOUT ROUTES ---
+Route::middleware(['auth'])->group(function () {
+    Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout.index');
+    Route::post('/checkout', [CheckoutController::class, 'store'])->name('checkout.store');
+    Route::get('/order/success', [CheckoutController::class, 'success'])->name('checkout.success');
 });
 /*
 |--------------------------------------------------------------------------
