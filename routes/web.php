@@ -5,7 +5,8 @@ use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\UserController;
-
+use App\Http\Controllers\Admin\ProductController as AdminProductController;
+use App\Http\Controllers\Seller\ProductController as SellerProductController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -47,14 +48,14 @@ Route::middleware(['auth'])->group(function () {
         //     return view('admin.manage-users');
         // })->name('manage-users');
         Route::resource('users', UserController::class)->only(['index', 'update', 'destroy']);
-    });
+        Route::resource('products', AdminProductController::class)->only(['index']);});
 
     // SELLER ROUTES
     Route::group(['middleware' => ['role:seller'], 'prefix' => 'seller', 'as' => 'seller.'], function () {
         Route::get('/dashboard', function () {
             return view('seller.dashboard');
         })->name('dashboard');
-    });
+        Route::resource('products', SellerProductController::class); });
 
     // BUYER ROUTES
     Route::group(['middleware' => ['role:buyer'], 'prefix' => 'home', 'as' => 'buyer.'], function () {
