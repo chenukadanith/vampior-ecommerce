@@ -7,6 +7,12 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\ProductController as AdminProductController;
 use App\Http\Controllers\Seller\ProductController as SellerProductController;
+// --- NEW: Add the controllers for public product viewing ---
+use App\Http\Controllers\HomeController;
+use App\Http\Controllers\ProductViewController;
+use App\Http\Controllers\CartController; 
+
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -20,9 +26,14 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+// --- MODIFIED: This now uses the HomeController to fetch and display products ---
+Route::get('/dashboard', [HomeController::class, 'index'])
+    ->middleware(['auth', 'verified'])->name('dashboard');
+
+// --- NEW: This is the dynamic route for a single product page ---
+Route::get('/product/{product:slug}', [ProductViewController::class, 'show'])
+    ->middleware(['auth'])->name('product.show');
+
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -30,7 +41,13 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-
+Route::middleware(['auth'])->group(function () {
+    Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
+    Route::post('/cart/add/{product}', [CartController::class, 'add'])->name('cart.add');
+    Route::patch('/cart/update/{product}', [CartController::class, 'update'])->name('cart.update');
+    Route::delete('/cart/remove/{product}', [CartController::class, 'remove'])->name('cart.remove');
+    Route::post('/cart/clear', [CartController::class, 'clear'])->name('cart.clear');
+});
 /*
 |--------------------------------------------------------------------------
 | Role-Based Routes
@@ -43,24 +60,23 @@ Route::middleware('auth')->group(function () {
 Route::middleware(['auth'])->group(function () {
     // ADMIN ROUTES
     Route::group(['middleware' => ['role:admin'], 'prefix' => 'admin', 'as' => 'admin.'], function () {
-      
-        // Route::get('/manage-users', function () {
-        //     return view('admin.manage-users');
-        // })->name('manage-users');
         Route::resource('users', UserController::class)->only(['index', 'update', 'destroy']);
-        Route::resource('products', AdminProductController::class)->only(['index']);});
+        Route::resource('products', AdminProductController::class)->only(['index']);
+    });
 
     // SELLER ROUTES
     Route::group(['middleware' => ['role:seller'], 'prefix' => 'seller', 'as' => 'seller.'], function () {
         Route::get('/dashboard', function () {
             return view('seller.dashboard');
         })->name('dashboard');
-        Route::resource('products', SellerProductController::class); });
+        Route::resource('products', SellerProductController::class);
+    });
 
-    // BUYER ROUTES
+    // BUYER ROUTES (This can be removed if buyers just use the main dashboard)
     Route::group(['middleware' => ['role:buyer'], 'prefix' => 'home', 'as' => 'buyer.'], function () {
         Route::get('/', function () {
-            return view('buyer.home');
+            // This now redirects buyers to the main product dashboard
+            return redirect()->route('dashboard');
         })->name('home');
     });
 });
@@ -70,9 +86,6 @@ Route::middleware(['auth'])->group(function () {
 |--------------------------------------------------------------------------
 | Socialite & Authentication Routes
 |--------------------------------------------------------------------------
-|
-| Handles social logins and post-login redirection logic.
-|
 */
 
 // Socialite Login Routes
@@ -84,18 +97,7 @@ Route::get('login/{provider}/callback', [SocialController::class, 'callback'])
     ->where('provider', 'google|github')
     ->name('social.callback');
 
-// Role redirect route (after login)
-Route::get('/role-redirect', function () {
-    $user = auth()->user();
-    if ($user->hasRole('admin')) {
-        return redirect()->route('admin.dashboard');
-    }
-    if ($user->hasRole('seller')) {
-        return redirect()->route('seller.dashboard');
-    }
-    return redirect()->route('buyer.home');
-})->middleware('auth')->name('role.redirect');
-
+// --- CLEANED UP: Kept only the correct redirect route ---
 Route::get('/role-redirect', function () {
     // All logged-in users are now sent to the main dashboard.
     return redirect()->route('dashboard');
@@ -103,3 +105,4 @@ Route::get('/role-redirect', function () {
 
 
 require __DIR__ . '/auth.php';
+
