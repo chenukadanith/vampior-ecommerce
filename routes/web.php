@@ -4,6 +4,7 @@ use App\Http\Controllers\Auth\SocialController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Admin\UserController;
 
 /*
 |--------------------------------------------------------------------------
@@ -41,9 +42,11 @@ Route::middleware('auth')->group(function () {
 Route::middleware(['auth'])->group(function () {
     // ADMIN ROUTES
     Route::group(['middleware' => ['role:admin'], 'prefix' => 'admin', 'as' => 'admin.'], function () {
-        Route::get('/', function () {
-            return view('admin.dashboard');
-        })->name('dashboard');
+      
+        // Route::get('/manage-users', function () {
+        //     return view('admin.manage-users');
+        // })->name('manage-users');
+        Route::resource('users', UserController::class)->only(['index', 'update', 'destroy']);
     });
 
     // SELLER ROUTES
@@ -90,6 +93,11 @@ Route::get('/role-redirect', function () {
         return redirect()->route('seller.dashboard');
     }
     return redirect()->route('buyer.home');
+})->middleware('auth')->name('role.redirect');
+
+Route::get('/role-redirect', function () {
+    // All logged-in users are now sent to the main dashboard.
+    return redirect()->route('dashboard');
 })->middleware('auth')->name('role.redirect');
 
 

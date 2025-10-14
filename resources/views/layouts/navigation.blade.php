@@ -34,6 +34,15 @@
                     </x-slot>
 
                     <x-slot name="content">
+
+
+                        @role('admin')
+                        <x-dropdown-link :href="route('admin.users.index')">
+                            {{ __('Manage Users') }}
+                        </x-dropdown-link>
+                        <div class="border-t border-gray-200"></div> 
+                         @endrole
+
                         <x-dropdown-link :href="route('profile.edit')">
                             {{ __('Profile') }}
                         </x-dropdown-link>
@@ -80,6 +89,12 @@
             </div>
 
             <div class="mt-3 space-y-1">
+                @role('admin')
+                    <x-responsive-nav-link :href="route('admin.users.index')">
+                        {{ __('Manage Users') }}
+                    </x-responsive-nav-link>
+                @endrole
+
                 <x-responsive-nav-link :href="route('profile.edit')">
                     {{ __('Profile') }}
                 </x-responsive-nav-link>
