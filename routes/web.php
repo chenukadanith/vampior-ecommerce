@@ -1,11 +1,18 @@
 <?php
 
-use App\Http\Controllers\ProfileController;
-use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\SocialController;
+use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Route;
 
-
+/*
+|--------------------------------------------------------------------------
+| Web Routes
+|--------------------------------------------------------------------------
+|
+| Standard public and authenticated routes.
+|
+*/
 
 Route::get('/', function () {
     return view('welcome');
@@ -22,6 +29,49 @@ Route::middleware('auth')->group(function () {
 });
 
 
+/*
+|--------------------------------------------------------------------------
+| Role-Based Routes
+|--------------------------------------------------------------------------
+|
+| Routes protected by role-specific middleware.
+|
+*/
+
+Route::middleware(['auth'])->group(function () {
+    // ADMIN ROUTES
+    Route::group(['middleware' => ['role:admin'], 'prefix' => 'admin', 'as' => 'admin.'], function () {
+        Route::get('/', function () {
+            return view('admin.dashboard');
+        })->name('dashboard');
+    });
+
+    // SELLER ROUTES
+    Route::group(['middleware' => ['role:seller'], 'prefix' => 'seller', 'as' => 'seller.'], function () {
+        Route::get('/dashboard', function () {
+            return view('seller.dashboard');
+        })->name('dashboard');
+    });
+
+    // BUYER ROUTES
+    Route::group(['middleware' => ['role:buyer'], 'prefix' => 'home', 'as' => 'buyer.'], function () {
+        Route::get('/', function () {
+            return view('buyer.home');
+        })->name('home');
+    });
+});
+
+
+/*
+|--------------------------------------------------------------------------
+| Socialite & Authentication Routes
+|--------------------------------------------------------------------------
+|
+| Handles social logins and post-login redirection logic.
+|
+*/
+
+// Socialite Login Routes
 Route::get('login/{provider}', [SocialController::class, 'redirect'])
     ->where('provider', 'google|github')
     ->name('social.redirect');
@@ -34,12 +84,13 @@ Route::get('login/{provider}/callback', [SocialController::class, 'callback'])
 Route::get('/role-redirect', function () {
     $user = auth()->user();
     if ($user->hasRole('admin')) {
-        return redirect('/admin');
+        return redirect()->route('admin.dashboard');
     }
     if ($user->hasRole('seller')) {
-        return redirect('/seller/dashboard');
+        return redirect()->route('seller.dashboard');
     }
-    return redirect('/home');
+    return redirect()->route('buyer.home');
 })->middleware('auth')->name('role.redirect');
 
-require __DIR__.'/auth.php';
+
+require __DIR__ . '/auth.php';
