@@ -72,6 +72,9 @@
                         @role('admin')
                             <x-dropdown-link :href="route('admin.users.index')"> {{ __('Manage Users') }} </x-dropdown-link>
                             <x-dropdown-link :href="route('admin.categories.index')"> {{ __('Manage Categories') }} </x-dropdown-link>
+                            <x-dropdown-link :href="route('admin.orders.index')">
+                                {{ __('Manage Orders') }}
+                            </x-dropdown-link>
                         @endrole
                         @hasanyrole('admin|seller')
                             <x-dropdown-link :href="auth()->user()->hasRole('admin') ? route('admin.products.index') : route('seller.products.index')"> {{ __('Manage Products') }} </x-dropdown-link>
@@ -123,6 +126,9 @@
                 @role('admin')
                     <x-responsive-nav-link :href="route('admin.users.index')"> {{ __('Manage Users') }} </x-responsive-nav-link>
                     <x-responsive-nav-link :href="route('admin.categories.index')"> {{ __('Manage Categories') }} </x-responsive-nav-link>
+                    <x-responsive-nav-link :href="route('admin.orders.index')">
+                        {{ __('Manage Orders') }}
+                    </x-responsive-nav-link>
                 @endrole
                 @hasanyrole('admin|seller')
                     <x-responsive-nav-link :href="auth()->user()->hasRole('admin') ? route('admin.products.index') : route('seller.products.index')"> {{ __('Manage Products') }} </x-responsive-nav-link>

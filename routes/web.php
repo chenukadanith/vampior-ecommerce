@@ -16,6 +16,7 @@ use App\Http\Controllers\Seller\OrderController as SellerOrderController;
 use App\Http\Controllers\Buyer\OrderController as BuyerOrderController;
 use App\Http\Controllers\Admin\CategoryController as AdminCategoryController;
 use App\Http\Controllers\WishlistController;
+use App\Http\Controllers\Admin\OrderController as AdminOrderController;
 
 
 
@@ -88,6 +89,8 @@ Route::middleware(['auth'])->group(function () {
         Route::resource('users', UserController::class)->only(['index', 'update', 'destroy']);
         Route::resource('products', AdminProductController::class); 
         Route::resource('categories', AdminCategoryController::class);
+        Route::resource('orders', AdminOrderController::class)->only(['index', 'show']);
+
 
     });
 
