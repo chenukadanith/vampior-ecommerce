@@ -63,4 +63,8 @@ public function sales()
 {
     return $this->hasManyThrough(OrderItem::class, Product::class);
 }
+public function wishlist()
+{
+    return $this->belongsToMany(Product::class, 'product_user');
+}
 }
