@@ -16,4 +16,9 @@ class Order extends Model
         'shipping_city',
         'shipping_postal_code',
     ];
+
+    public function items()
+{
+    return $this->hasMany(OrderItem::class);
+}
 }

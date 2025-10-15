@@ -52,4 +52,15 @@ class User extends Authenticatable
 {
     return $this->hasMany(Product::class);
 }
+
+public function orders()
+{
+    return $this->hasMany(Order::class);
+}
+
+// Order items this user needs to fulfill (as a seller)
+public function sales()
+{
+    return $this->hasManyThrough(OrderItem::class, Product::class);
+}
 }

@@ -13,7 +13,7 @@ class Product extends Model
         'slug',
         'description',
         'price',
-        'category',
+        'category_id',
         'tags',
         'stock_quantity',
         'image',
@@ -22,5 +22,9 @@ class Product extends Model
     public function seller()
 {
     return $this->belongsTo(User::class, 'user_id');
+}
+public function category()
+{
+    return $this->belongsTo(Category::class);
 }
 }

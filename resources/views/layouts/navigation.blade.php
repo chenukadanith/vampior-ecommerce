@@ -53,6 +53,12 @@
                              {{ __('Manage Products') }}
                          </x-dropdown-link>
                         @endhasanyrole
+                        <!-- NEW: My Orders Link for Buyers & Sellers -->
+                        @hasanyrole('buyer|seller')
+                        <x-dropdown-link :href="auth()->user()->hasRole('seller') ? route('seller.orders.index') : route('buyer.orders.index')">
+                            {{ __('My Orders') }}
+                        </x-dropdown-link>
+                        @endhasanyrole
 
                         <x-dropdown-link :href="route('profile.edit')">
                             {{ __('Profile') }}
@@ -116,6 +122,12 @@
                     {{ __('Manage Products') }}
                 </x-responsive-nav-link>
             @endhasanyrole
+            
+            @hasanyrole('buyer|seller')
+            <x-responsive-nav-link :href="auth()->user()->hasRole('seller') ? route('seller.orders.index') : route('buyer.orders.index')">
+                {{ __('My Orders') }}
+            </x-responsive-nav-link>
+             @endhasanyrole
 
                 <x-responsive-nav-link :href="route('profile.edit')">
                     {{ __('Profile') }}

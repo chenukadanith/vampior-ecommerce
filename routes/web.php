@@ -12,6 +12,8 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ProductViewController;
 use App\Http\Controllers\CartController; 
 use App\Http\Controllers\CheckoutController;
+use App\Http\Controllers\Seller\OrderController as SellerOrderController;
+use App\Http\Controllers\Buyer\OrderController as BuyerOrderController;
 
 
 
@@ -79,14 +81,18 @@ Route::middleware(['auth'])->group(function () {
             return view('seller.dashboard');
         })->name('dashboard');
         Route::resource('products', SellerProductController::class);
+        Route::get('/orders', [SellerOrderController::class, 'index'])->name('orders.index');
+        Route::patch('/orders/{orderItem}', [SellerOrderController::class, 'update'])->name('orders.update');
     });
 
-    // BUYER ROUTES (This can be removed if buyers just use the main dashboard)
+    // BUYER ROUTES 
     Route::group(['middleware' => ['role:buyer'], 'prefix' => 'home', 'as' => 'buyer.'], function () {
         Route::get('/', function () {
             // This now redirects buyers to the main product dashboard
             return redirect()->route('dashboard');
         })->name('home');
+        Route::get('/orders', [BuyerOrderController::class, 'index'])->name('orders.index');
+        Route::patch('/orders/{orderItem}', [BuyerOrderController::class, 'update'])->name('orders.update');
     });
 });
 
