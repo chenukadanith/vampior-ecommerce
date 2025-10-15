@@ -14,6 +14,8 @@ use App\Http\Controllers\CartController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\Seller\OrderController as SellerOrderController;
 use App\Http\Controllers\Buyer\OrderController as BuyerOrderController;
+use App\Http\Controllers\Admin\CategoryController as AdminCategoryController;
+
 
 
 
@@ -73,6 +75,8 @@ Route::middleware(['auth'])->group(function () {
     Route::group(['middleware' => ['role:admin'], 'prefix' => 'admin', 'as' => 'admin.'], function () {
         Route::resource('users', UserController::class)->only(['index', 'update', 'destroy']);
         Route::resource('products', AdminProductController::class)->only(['index']);
+        Route::resource('categories', AdminCategoryController::class);
+
     });
 
     // SELLER ROUTES

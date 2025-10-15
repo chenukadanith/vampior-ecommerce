@@ -4,15 +4,16 @@ namespace App\Http\Controllers\Seller;
 
 use App\Http\Controllers\Controller;
 use App\Models\Product;
+use App\Models\Category; // <-- Add this line
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
 use Intervention\Image\Facades\Image;
-use Illuminate\Foundation\Auth\Access\AuthorizesRequests; 
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 class ProductController extends Controller
 {
-    use AuthorizesRequests; // <-- And add this line
+    use AuthorizesRequests;
 
     /**
      * Display a listing of the seller's products.
@@ -29,7 +30,9 @@ class ProductController extends Controller
      */
     public function create()
     {
-        return view('products.create');
+        // MODIFIED: Fetch categories to pass to the form
+        $categories = Category::all();
+        return view('products.create', compact('categories'));
     }
 
     /**
@@ -37,35 +40,37 @@ class ProductController extends Controller
      */
     public function store(Request $request)
     {
+        // MODIFIED: Update validation for category_id
         $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'required|string',
             'price' => 'required|numeric|min:0',
-            'category' => 'required|string|max:255',
+            'category_id' => 'required|exists:categories,id',
             'stock_quantity' => 'required|integer|min:0',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
-    
+
         $path = null;
         if ($request->hasFile('image')) {
             $image = $request->file('image');
             $filename = time() . '.' . $image->getClientOriginalExtension();
             
-            // Store the image directly using Laravel's built-in storage
+            // Using your quick fix with Laravel's built-in storage
             $path = $image->storeAs('products', $filename, 'public');
         }
-    
+
+        // MODIFIED: Use category_id instead of category
         auth()->user()->products()->create([
             'title' => $request->title,
             'slug' => Str::slug($request->title),
             'description' => $request->description,
             'price' => $request->price,
-            'category' => $request->category,
+            'category_id' => $request->category_id,
             'tags' => $request->tags,
             'stock_quantity' => $request->stock_quantity,
             'image' => $path,
         ]);
-    
+
         return redirect()->route('seller.products.index')->with('success', 'Product created successfully.');
     }
 
@@ -76,7 +81,9 @@ class ProductController extends Controller
     {
         // Authorize using the ProductPolicy
         $this->authorize('update', $product);
-        return view('products.edit', compact('product'));
+        // MODIFIED: Fetch categories to pass to the form
+        $categories = Category::all();
+        return view('products.edit', compact('product', 'categories'));
     }
 
     /**
@@ -87,11 +94,12 @@ class ProductController extends Controller
         // Authorize using the ProductPolicy
         $this->authorize('update', $product);
 
+        // MODIFIED: Update validation for category_id
         $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'required|string',
             'price' => 'required|numeric|min:0',
-            'category' => 'required|string|max:255',
+            'category_id' => 'required|exists:categories,id',
             'stock_quantity' => 'required|integer|min:0',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
@@ -105,19 +113,17 @@ class ProductController extends Controller
 
             $image = $request->file('image');
             $filename = time() . '.' . $image->getClientOriginalExtension();
-            $img = Image::make($image->getRealPath());
-            $img->resize(800, null, function ($constraint) {
-                $constraint->aspectRatio();
-            })->save(storage_path('app/public/products/' . $filename));
-            $path = 'products/' . $filename;
+            // This is still using the old Intervention Image syntax. Let's keep your quick fix for consistency.
+            $path = $image->storeAs('products', $filename, 'public');
         }
 
+        // MODIFIED: Use category_id instead of category
         $product->update([
             'title' => $request->title,
             'slug' => Str::slug($request->title),
             'description' => $request->description,
             'price' => $request->price,
-            'category' => $request->category,
+            'category_id' => $request->category_id,
             'tags' => $request->tags,
             'stock_quantity' => $request->stock_quantity,
             'image' => $path,
