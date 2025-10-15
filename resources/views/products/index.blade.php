@@ -4,12 +4,15 @@
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
                 {{ __('Manage Products') }}
             </h2>
-            {{-- Show 'Add New' button only to sellers --}}
-            @role('seller')
-                <a href="{{ route('seller.products.create') }}" class="inline-flex items-center px-4 py-2 bg-gray-800 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700 active:bg-gray-900 focus:outline-none focus:border-gray-900 focus:ring ring-gray-300 disabled:opacity-25 transition ease-in-out duration-150">
+
+            <!-- START: Smart "Add New Product" Button -->
+            @hasanyrole('admin|seller')
+                <a href="{{ auth()->user()->hasRole('admin') ? route('admin.products.create') : route('seller.products.create') }}" class="inline-flex items-center px-4 py-2 bg-gray-800 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700 active:bg-gray-900 focus:outline-none focus:border-gray-900 focus:ring ring-gray-300 disabled:opacity-25 transition ease-in-out duration-150">
                     {{ __('Add New Product') }}
                 </a>
-            @endrole
+            @endhasanyrole
+            <!-- END: Smart "Add New Product" Button -->
+            
         </div>
     </x-slot>
 
@@ -52,15 +55,20 @@
                                             <td class="px-6 py-4 whitespace-nowrap text-gray-500">{{ $product->seller->name ?? 'N/A' }}</td>
                                         @endrole
                                         <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                            {{-- Show actions only to sellers --}}
-                                            @role('seller')
-                                                <a href="{{ route('seller.products.edit', $product) }}" class="text-indigo-600 hover:text-indigo-900">Edit</a>
-                                                <form action="{{ route('seller.products.destroy', $product) }}" method="POST" class="inline-block ml-2" onsubmit="return confirm('Are you sure you want to delete this product?');">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button type="submit" class="text-red-600 hover:text-red-900">Delete</button>
-                                                </form>
-                                            @endrole
+                                            {{-- Use can() with the policy to determine who can edit/delete --}}
+                                            @can('update', $product)
+                                                {{-- MODIFIED: Smart route points to admin or seller route based on role --}}
+                                                <a href="{{ auth()->user()->hasRole('admin') ? route('admin.products.edit', $product) : route('seller.products.edit', $product) }}" class="text-indigo-600 hover:text-indigo-900">Edit</a>
+                                            @endcan
+                                            
+                                            @can('delete', $product)
+                                            {{-- MODIFIED: Smart route points to admin or seller route based on role --}}
+                                            <form action="{{ auth()->user()->hasRole('admin') ? route('admin.products.destroy', $product) : route('seller.products.destroy', $product) }}" method="POST" class="inline-block ml-2" onsubmit="return confirm('Are you sure you want to delete this product?');">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="text-red-600 hover:text-red-900">Delete</button>
+                                            </form>
+                                            @endcan
                                         </td>
                                     </tr>
                                 @empty

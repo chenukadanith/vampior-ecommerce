@@ -86,7 +86,7 @@ Route::middleware(['auth'])->group(function () {
     // ADMIN ROUTES
     Route::group(['middleware' => ['role:admin'], 'prefix' => 'admin', 'as' => 'admin.'], function () {
         Route::resource('users', UserController::class)->only(['index', 'update', 'destroy']);
-        Route::resource('products', AdminProductController::class)->only(['index']);
+        Route::resource('products', AdminProductController::class); 
         Route::resource('categories', AdminCategoryController::class);
 
     });
