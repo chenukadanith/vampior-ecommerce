@@ -52,11 +52,18 @@
                         </div>
 
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
-                             <!-- Category -->
-                            <div>
-                                <label for="category" class="block font-medium text-sm text-gray-700">{{ __('Category') }}</label>
-                                <input id="category" class="block mt-1 w-full border-gray-300 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 rounded-md shadow-sm" type="text" name="category" value="{{ old('category') }}" required />
-                            </div>
+                          <!-- Category -->
+                        <div>
+                            <label for="category_id" class="block font-medium text-sm text-gray-700">{{ __('Category') }}</label>
+                            <select id="category_id" name="category_id" class="block mt-1 w-full border-gray-300 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 rounded-md shadow-sm" required>
+                                <option value="">Select a Category</option>
+                                @foreach($categories as $category)
+                                    <option value="{{ $category->id }}" {{ old('category_id') == $category->id ? 'selected' : '' }}>
+                                        {{ $category->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>  
 
                              <!-- Tags -->
                             <div>
