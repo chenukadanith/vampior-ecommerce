@@ -13,24 +13,31 @@ class HomeController extends Controller
      */
     public function index(Request $request)
     {
+        // Start with a base query
         $query = Product::query();
 
+        // If a category is selected, filter by it
         if ($request->filled('category')) {
             $query->where('category_id', $request->category);
         }
 
+        // If a search term is entered, filter by it
         if ($request->filled('search')) {
             $searchTerm = $request->search;
             $query->where('title', 'like', "%{$searchTerm}%");
         }
 
-        // MODIFIED: Use paginate instead of get() to enable a "See More" feature
+        // Execute the query and paginate results
         $products = $query->latest()->paginate(12);
 
+        // Get all categories for the filter dropdown
         $categories = Category::all();
 
-        // Pass the paginated products and categories to the view
-        return view('dashboard', compact('products', 'categories'));
+        // NEW: Get an array of product IDs that are in the user's wishlist
+        $wishlistProductIds = auth()->user()->wishlist()->pluck('products.id')->toArray();
+
+        // MODIFIED: Pass the new wishlist IDs variable to the view
+        return view('dashboard', compact('products', 'categories', 'wishlistProductIds'));
     }
 }
 

@@ -20,7 +20,7 @@
                     <!-- Product Details -->
                     <div>
                         <h1 class="text-3xl font-bold text-gray-900">{{ $product->title }}</h1>
-                        <p class="mt-2 text-sm text-gray-500">Category: {{ $product->category }}</p>
+                        <p class="mt-2 text-sm text-gray-500">Category: {{ $product->category->name ?? 'Uncategorized' }}</p>
 
                         <p class="mt-4 text-3xl font-extrabold text-indigo-600">${{ number_format($product->price, 2) }}</p>
 
@@ -39,14 +39,41 @@
                             @endif
                         </div>
 
-                        <div class="mt-8">
-                            <form action="{{ route('cart.add', $product) }}" method="POST">
+                        <!-- MODIFIED: Action Buttons (Cart & Wishlist) -->
+                        <div class="mt-8 flex space-x-4">
+                            <!-- Add to Cart Form -->
+                            <form action="{{ route('cart.add', $product) }}" method="POST" class="flex-1">
                                 @csrf
-                                <button type="submit" class="w-full bg-gray-800 border border-transparent rounded-md py-3 px-8 flex items-center justify-center text-base font-medium text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 disabled:opacity-50"
+                                <button type="submit" class="w-full bg-gray-800 border border-transparent rounded-md py-3 px-8 flex items-center justify-center text-base font-medium text-white hover:bg-gray-700 disabled:opacity-50"
                                         {{ $product->stock_quantity <= 0 ? 'disabled' : '' }}>
                                     Add to cart
                                 </button>
                             </form>
+
+                            <!-- START: Wishlist Button -->
+                            @if(in_array($product->id, $wishlistProductIds))
+                                <!-- Product is in wishlist: show Remove button -->
+                                <form action="{{ route('wishlist.remove', $product) }}" method="POST">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="p-3 border rounded-md text-red-500 bg-red-50 border-red-300 hover:bg-red-100 transition-colors duration-200" title="Remove from Wishlist">
+                                        <svg class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
+                                            <path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd" />
+                                        </svg>
+                                    </button>
+                                </form>
+                            @else
+                                <!-- Product is not in wishlist: show Add button -->
+                                <form action="{{ route('wishlist.add', $product) }}" method="POST">
+                                    @csrf
+                                    <button type="submit" class="p-3 border rounded-md text-gray-400 hover:text-red-500 hover:bg-red-50 hover:border-red-300 transition-colors duration-200" title="Add to Wishlist">
+                                        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                                        </svg>
+                                    </button>
+                                </form>
+                            @endif
+                            <!-- END: Wishlist Button -->
                         </div>
 
                         <!-- Display Success Message -->

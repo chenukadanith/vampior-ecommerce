@@ -14,7 +14,11 @@ class ProductViewController extends Controller
      */
     public function show(Product $product)
     {
-        return view('product-detail', compact('product'));
+        // Get the IDs of products in the user's wishlist
+        $wishlistProductIds = auth()->user()->wishlist()->pluck('products.id')->toArray();
+        
+        // Pass the product and the wishlist IDs to the view
+        return view('product-detail', compact('product', 'wishlistProductIds'));
     }
 }
 

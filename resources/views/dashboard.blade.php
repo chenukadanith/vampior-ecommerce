@@ -8,7 +8,7 @@
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
 
-         
+            <!-- START: Filter and Search Form -->
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg mb-6">
                 <div class="p-4">
                     <form action="{{ route('dashboard') }}" method="GET" class="flex flex-col md:flex-row md:items-end md:space-x-3 space-y-3 md:space-y-0">
@@ -55,12 +55,14 @@
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                     @foreach ($products as $product)
                         <div class="group relative flex flex-col bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-all duration-200 border border-gray-200">
+                            
+                            <!-- Main content link -->
                             <a href="{{ route('product.show', $product) }}" class="flex flex-col h-full">
                                 <!-- Compact Image -->
                                 <div class="relative w-full h-40 bg-gray-50 overflow-hidden">
                                     <img src="{{ $product->image ? asset('storage/' . $product->image) : 'https://placehold.co/400x300/e2e8f0/94a3b8?text=No+Image' }}"
-                                        alt="{{ $product->title }}"
-                                        class="object-cover w-full h-full group-hover:scale-105 transition-transform duration-300" />
+                                         alt="{{ $product->title }}"
+                                         class="object-cover w-full h-full group-hover:scale-105 transition-transform duration-300" />
                                     <!-- Category Badge -->
                                     <div class="absolute top-2 left-2 bg-white/90 backdrop-blur-sm text-gray-700 rounded-md px-2 py-1 text-xs font-medium shadow-sm">
                                         <i class="fa fa-tag mr-1 text-indigo-500"></i>{{ $product->category->name ?? 'Uncategorized' }}
@@ -86,6 +88,33 @@
                                     </div>
                                 </div>
                             </a>
+
+                            <!-- START: Wishlist Button (Added without changing layout) -->
+                            <div class="absolute top-2 right-2 z-10">
+                                @if(in_array($product->id, $wishlistProductIds))
+                                    <!-- Product is in wishlist: show Remove button -->
+                                    <form action="{{ route('wishlist.remove', $product) }}" method="POST">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="p-2 bg-white/70 rounded-full text-red-500 hover:bg-white transition-colors duration-200" title="Remove from Wishlist">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                                <path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd" />
+                                            </svg>
+                                        </button>
+                                    </form>
+                                @else
+                                    <!-- Product is not in wishlist: show Add button -->
+                                    <form action="{{ route('wishlist.add', $product) }}" method="POST">
+                                        @csrf
+                                        <button type="submit" class="p-2 bg-white/70 rounded-full text-gray-400 hover:text-red-500 hover:bg-white transition-colors duration-200" title="Add to Wishlist">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                                            </svg>
+                                        </button>
+                                    </form>
+                                @endif
+                            </div>
+                            <!-- END: Wishlist Button -->
                         </div>
                     @endforeach
                 </div>
@@ -112,3 +141,4 @@
         </div>
     </div>
 </x-app-layout>
+
