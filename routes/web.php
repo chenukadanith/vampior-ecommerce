@@ -17,6 +17,7 @@ use App\Http\Controllers\Buyer\OrderController as BuyerOrderController;
 use App\Http\Controllers\Admin\CategoryController as AdminCategoryController;
 use App\Http\Controllers\WishlistController;
 use App\Http\Controllers\Admin\OrderController as AdminOrderController;
+use App\Http\Controllers\Seller\AnalyticsController as SellerAnalyticsController;
 
 
 
@@ -102,6 +103,8 @@ Route::middleware(['auth'])->group(function () {
         Route::resource('products', SellerProductController::class);
         Route::get('/orders', [SellerOrderController::class, 'index'])->name('orders.index');
         Route::patch('/orders/{orderItem}', [SellerOrderController::class, 'update'])->name('orders.update');
+        Route::get('/analytics', [SellerAnalyticsController::class, 'index'])->name('analytics.index');
+
     });
 
     // BUYER ROUTES 

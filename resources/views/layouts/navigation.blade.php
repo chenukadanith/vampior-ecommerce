@@ -82,6 +82,11 @@
                         @hasanyrole('buyer|seller')
                             <x-dropdown-link :href="auth()->user()->hasRole('seller') ? route('seller.orders.index') : route('buyer.orders.index')"> {{ __('My Orders') }} </x-dropdown-link>
                         @endhasanyrole
+                         @role('seller')
+                            <x-dropdown-link :href="route('seller.analytics.index')">
+                                {{ __('Analytics') }}
+                            </x-dropdown-link>
+                        @endrole
                         <div class="border-t border-gray-200"></div>
                         <!-- Standard Links -->
                         <x-dropdown-link :href="route('profile.edit')"> {{ __('Profile') }} </x-dropdown-link>
@@ -136,6 +141,11 @@
                 @hasanyrole('buyer|seller')
                     <x-responsive-nav-link :href="auth()->user()->hasRole('seller') ? route('seller.orders.index') : route('buyer.orders.index')"> {{ __('My Orders') }} </x-responsive-nav-link>
                 @endhasanyrole
+                @role('seller')
+                    <x-responsive-nav-link :href="route('seller.analytics.index')">
+                        {{ __('Analytics') }}
+                    </x-responsive-nav-link>
+                @endrole
                 <x-responsive-nav-link :href="route('profile.edit')"> {{ __('Profile') }} </x-responsive-nav-link>
                 <!-- Authentication -->
                 <form method="POST" action="{{ route('logout') }}">
