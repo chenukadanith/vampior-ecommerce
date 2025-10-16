@@ -5,20 +5,18 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Product;
 use App\Models\Category;
-use App\Models\User; // <-- Add this to fetch sellers
+use App\Models\User; 
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
-use Intervention\Image\Facades\Image; // Assuming v2 is used
+use Intervention\Image\Facades\Image; 
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 class ProductController extends Controller
 {
     use AuthorizesRequests;
 
-    /**
-     * Display a listing of all products.
-     */
+   
     public function index()
     {
         // Admins see all products from all sellers
@@ -26,9 +24,7 @@ class ProductController extends Controller
         return view('products.index', compact('products'));
     }
 
-    /**
-     * Show the form for creating a new product.
-     */
+    
     public function create()
     {
         $categories = Category::all();
@@ -37,14 +33,12 @@ class ProductController extends Controller
         return view('admin.products.create', compact('categories', 'sellers'));
     }
 
-    /**
-     * Store a newly created product in storage.
-     */
+    
     public function store(Request $request)
     {
         $request->validate([
             'title' => 'required|string|max:255',
-            'user_id' => 'required|exists:users,id', // <-- Admin must select a seller
+            'user_id' => 'required|exists:users,id', 
             'description' => 'required|string',
             'price' => 'required|numeric|min:0',
             'category_id' => 'required|exists:categories,id',
@@ -63,7 +57,7 @@ class ProductController extends Controller
         }
 
         Product::create([
-            'user_id' => $request->user_id, // <-- Use the selected seller's ID
+            'user_id' => $request->user_id,
             'title' => $request->title,
             'slug' => Str::slug($request->title),
             'description' => $request->description,
@@ -77,9 +71,7 @@ class ProductController extends Controller
         return redirect()->route('admin.products.index')->with('success', 'Product created successfully.');
     }
 
-    /**
-     * Show the form for editing the specified product.
-     */
+    
     public function edit(Product $product)
     {
         // The ProductPolicy's before() method automatically grants access to admins
@@ -87,9 +79,7 @@ class ProductController extends Controller
         return view('products.edit', compact('product', 'categories'));
     }
 
-    /**
-     * Update the specified product in storage.
-     */
+    
     public function update(Request $request, Product $product)
     {
         // The ProductPolicy's before() method automatically grants access to admins
@@ -129,9 +119,7 @@ class ProductController extends Controller
         return redirect()->route('admin.products.index')->with('success', 'Product updated successfully.');
     }
 
-    /**
-     * Remove the specified product from storage.
-     */
+    
     public function destroy(Product $product)
     {
         // The ProductPolicy's before() method automatically grants access to admins

@@ -35,11 +35,9 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-// --- MODIFIED: This now uses the HomeController to fetch and display products ---
 Route::get('/dashboard', [HomeController::class, 'index'])
     ->middleware(['auth', 'verified'])->name('dashboard');
 
-// --- NEW: This is the dynamic route for a single product page ---
 Route::get('/product/{product:slug}', [ProductViewController::class, 'show'])
     ->middleware(['auth'])->name('product.show');
 
@@ -110,7 +108,6 @@ Route::middleware(['auth'])->group(function () {
     // BUYER ROUTES 
     Route::group(['middleware' => ['role:buyer'], 'prefix' => 'home', 'as' => 'buyer.'], function () {
         Route::get('/', function () {
-            // This now redirects buyers to the main product dashboard
             return redirect()->route('dashboard');
         })->name('home');
         Route::get('/orders', [BuyerOrderController::class, 'index'])->name('orders.index');
@@ -134,7 +131,6 @@ Route::get('login/{provider}/callback', [SocialController::class, 'callback'])
     ->where('provider', 'google|github')
     ->name('social.callback');
 
-// --- CLEANED UP: Kept only the correct redirect route ---
 Route::get('/role-redirect', function () {
     // All logged-in users are now sent to the main dashboard.
     return redirect()->route('dashboard');

@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Seller;
 
 use App\Http\Controllers\Controller;
 use App\Models\Product;
-use App\Models\Category; // <-- Add this line
+use App\Models\Category; 
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
@@ -30,7 +30,6 @@ class ProductController extends Controller
      */
     public function create()
     {
-        // MODIFIED: Fetch categories to pass to the form
         $categories = Category::all();
         return view('products.create', compact('categories'));
     }
@@ -55,11 +54,9 @@ class ProductController extends Controller
             $image = $request->file('image');
             $filename = time() . '.' . $image->getClientOriginalExtension();
             
-            // Using your quick fix with Laravel's built-in storage
             $path = $image->storeAs('products', $filename, 'public');
         }
 
-        // MODIFIED: Use category_id instead of category
         auth()->user()->products()->create([
             'title' => $request->title,
             'slug' => Str::slug($request->title),
@@ -113,11 +110,9 @@ class ProductController extends Controller
 
             $image = $request->file('image');
             $filename = time() . '.' . $image->getClientOriginalExtension();
-            // This is still using the old Intervention Image syntax. Let's keep your quick fix for consistency.
             $path = $image->storeAs('products', $filename, 'public');
         }
 
-        // MODIFIED: Use category_id instead of category
         $product->update([
             'title' => $request->title,
             'slug' => Str::slug($request->title),

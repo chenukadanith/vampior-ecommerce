@@ -8,9 +8,7 @@ use Illuminate\Http\Request;
 
 class OrderController extends Controller
 {
-    /**
-     * Display a listing of all orders.
-     */
+   
     public function index()
     {
         // Eager load the user (buyer) relationship to prevent N+1 issues
@@ -23,9 +21,7 @@ class OrderController extends Controller
         return view('admin.orders.index', compact('orders', 'totalOrders', 'totalRevenue'));
     }
 
-    /**
-     * Display the specified order.
-     */
+    
     public function show(Order $order)
     {
         // Eager load all relationships for the detailed view

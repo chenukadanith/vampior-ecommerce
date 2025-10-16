@@ -34,7 +34,6 @@ class UserController extends Controller
             'role' => 'required|exists:roles,name',
         ]);
 
-        // Use syncRoles to remove all old roles and apply the new one
         $user->syncRoles($request->role);
 
         return redirect()->route('admin.users.index')->with('success', 'User role updated successfully.');

@@ -78,7 +78,6 @@ class CheckoutController extends Controller
 
         } catch (\Exception $e) {
             DB::rollBack();
-            // Optionally log the error: Log::error($e->getMessage());
             return redirect()->back()->with('error', 'Something went wrong while placing your order. Please try again.');
         }
     }

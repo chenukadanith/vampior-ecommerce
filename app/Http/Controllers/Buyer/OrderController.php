@@ -23,7 +23,6 @@ class OrderController extends Controller
             abort(403);
         }
 
-        // A buyer can only mark a 'shipping' order as 'completed'
         if ($orderItem->status !== 'shipping') {
             return redirect()->back()->with('error', 'You can only complete orders that are currently shipping.');
         }

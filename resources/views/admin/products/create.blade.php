@@ -33,7 +33,6 @@
                             </select>
                         </div>
 
-                        <!-- Title, Description, etc. (Same as seller's form) -->
                         <div>
                             <label for="title" class="block font-medium text-sm text-gray-700">{{ __('Title') }}</label>
                             <input id="title" class="block mt-1 w-full border-gray-300 rounded-md shadow-sm" type="text" name="title" value="{{ old('title') }}" required />
