@@ -1,26 +1,33 @@
 name: Project Maintenance
+
 on:
   schedule:
     - cron: '0 3 * * *'   # Runs daily at 3 AM UTC (8:30 AM Sri Lanka)
   workflow_dispatch:        # Allows manual trigger
+
 permissions:
-  contents: write
+  contents: write           # Allows workflow to push changes
+
 jobs:
   update:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Update maintenance log
+      - name: Create daily log file
         run: |
-          mkdir -p .github/logs
-          echo "Last maintenance check: $(date)" > .github/logs/system-status.log
+          mkdir -p logs
+          TODAY=$(date +'%Y-%m-%d')
+          echo "Maintenance check: $(date)" > logs/log-$TODAY.txt
 
       - name: Commit and push changes
         run: |
           git config --global user.name "chenukadanith"
           git config --global user.email "chenukadanith@gmail.com"
-          git add -f .github/logs/system-status.log
-          git commit -m "System check: $(date)" || echo "No changes to commit"
+          git add logs/log-$(date +'%Y-%m-%d').txt
+          git commit -m "Daily system check: $(date)" || echo "No changes to commit"
           git push
