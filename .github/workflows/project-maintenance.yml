@@ -3,7 +3,8 @@ on:
   schedule:
     - cron: '0 3 * * *'   # Runs daily at 3 AM UTC (8:30 AM Sri Lanka)
   workflow_dispatch:        # Allows manual trigger
-
+permissions:
+  contents: write
 jobs:
   update:
     runs-on: ubuntu-latest
