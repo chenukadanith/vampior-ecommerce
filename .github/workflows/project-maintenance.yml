@@ -20,6 +20,6 @@ jobs:
         run: |
           git config --global user.name "chenukadanith"
           git config --global user.email "chenukadanith@gmail.com"
-          git add .github/logs/system-status.log
+          git add -f .github/logs/system-status.log
           git commit -m "System check: $(date)" || echo "No changes to commit"
           git push
