@@ -104,21 +104,29 @@ jobs:
 
       - name: Commit and push changes
         run: |
+          # Show what files were created
+          echo "Files created:"
+          ls -la logs/daily/ logs/hourly/ stats/ activity/ 2>/dev/null || true
+          
+          # Add all changes
           git add -A
+          
+          # Show what will be committed
+          echo "Changes to be committed:"
+          git status --short
           
           # Create descriptive commit message
           COMMIT_MSG="🤖 Automated maintenance: $(date +'%Y-%m-%d %H:%M')"
           
-          # Check if there are changes to commit
-          if git diff --staged --quiet; then
-            echo "No changes to commit"
-            # Create a dummy change to ensure commit
-            echo "$(date)" >> .maintenance-heartbeat
-            git add .maintenance-heartbeat
-          fi
+          # Always create a change to ensure commit happens
+          echo "Last run: $(date)" >> .maintenance-heartbeat
+          git add .maintenance-heartbeat
           
-          git commit -m "$COMMIT_MSG" || echo "Commit skipped"
-          git push origin main || echo "Push failed - will retry next run"
+          # Commit changes (will always succeed now)
+          git commit -m "$COMMIT_MSG"
+          
+          # Push to repository
+          git push origin main
 
       - name: Workflow summary
         run: |
