@@ -1,6 +1,7 @@
 name: Project Maintenance
 on:
   schedule:
+    # Dynamic scheduling - runs at varied times throughout the day
     - cron: '0 0,3,6,9,12,15,18,21 * * *'  # Runs 8 times per day (every 3 hours)
     - cron: '30 1,4,7,10,13,16,19,22 * * *' # Runs 8 times per day offset
     - cron: '15 2,5,8,11,14,17,20,23 * * *' # Runs 8 times per day offset
@@ -27,7 +28,37 @@ jobs:
           git config --global user.name "chenukadanith"
           git config --global user.email "chenukadanith@gmail.com"
 
+      - name: Determine if commit should be made
+        id: should_commit
+        run: |
+          # Generate random number between 1-100
+          CHANCE=$((RANDOM % 100 + 1))
+          
+          # Get day of week (0-6, 0 is Sunday)
+          DAY_OF_WEEK=$(date +%u)
+          
+          # 75% chance to commit (1-75 = yes, 76-100 = no)
+          # Slightly higher chance on weekdays (Mon-Fri)
+          if [ $DAY_OF_WEEK -le 5 ]; then
+            # Weekday: 80% chance
+            if [ $CHANCE -le 80 ]; then
+              echo "should_commit=true" >> $GITHUB_OUTPUT
+            else
+              echo "should_commit=false" >> $GITHUB_OUTPUT
+            fi
+          else
+            # Weekend: 65% chance (more realistic pattern)
+            if [ $CHANCE -le 65 ]; then
+              echo "should_commit=true" >> $GITHUB_OUTPUT
+            else
+              echo "should_commit=false" >> $GITHUB_OUTPUT
+            fi
+          fi
+          
+          echo "Commit decision: $([ $CHANCE -le 75 ] && echo 'YES' || echo 'NO') (rolled $CHANCE)"
+
       - name: Create activity logs
+        if: steps.should_commit.outputs.should_commit == 'true'
         run: |
           # Create directories
           mkdir -p logs/daily logs/hourly stats
@@ -53,6 +84,7 @@ jobs:
           echo "Workflow run: #${{ github.run_number }}" >> logs/hourly/check-$TODAY-$HOUR.txt
 
       - name: Update statistics
+        if: steps.should_commit.outputs.should_commit == 'true'
         run: |
           TODAY=$(date +'%Y-%m-%d')
           TOTAL_RUNS=${{ github.run_number }}
@@ -78,6 +110,7 @@ jobs:
           EOF
 
       - name: Generate random activity file
+        if: steps.should_commit.outputs.should_commit == 'true'
         run: |
           # Create varied content to ensure unique commits
           RANDOM_NUM=$RANDOM
@@ -94,6 +127,7 @@ jobs:
           EOF
 
       - name: Cleanup old logs (keep last 7 days)
+        if: steps.should_commit.outputs.should_commit == 'true'
         run: |
           # Remove hourly logs older than 7 days
           find logs/hourly -name "*.txt" -mtime +7 -delete 2>/dev/null || true
@@ -102,6 +136,7 @@ jobs:
           find logs/daily -name "*.txt" -mtime +30 -delete 2>/dev/null || true
 
       - name: Commit and push changes
+        if: steps.should_commit.outputs.should_commit == 'true'
         run: |
           # Add all changes
           git add -A
@@ -180,8 +215,15 @@ jobs:
 
       - name: Workflow summary
         run: |
-          echo "## ✅ Workflow Completed" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "- **Time:** $(date +'%Y-%m-%d %H:%M:%S UTC')" >> $GITHUB_STEP_SUMMARY
-          echo "- **Run:** #${{ github.run_number }}" >> $GITHUB_STEP_SUMMARY
-          echo "- **Status:** Active" >> $GITHUB_STEP_SUMMARY
+          if [ "${{ steps.should_commit.outputs.should_commit }}" == "true" ]; then
+            echo "## ✅ Commit Created" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "- **Time:** $(date +'%Y-%m-%d %H:%M:%S UTC')" >> $GITHUB_STEP_SUMMARY
+            echo "- **Run:** #${{ github.run_number }}" >> $GITHUB_STEP_SUMMARY
+            echo "- **Status:** Active" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "## ⏭️ Commit Skipped" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "- **Time:** $(date +'%Y-%m-%d %H:%M:%S UTC')" >> $GITHUB_STEP_SUMMARY
+            echo "- **Reason:** Random selection (more natural pattern)" >> $GITHUB_STEP_SUMMARY
+          fi
